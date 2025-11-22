@@ -29,9 +29,10 @@ public class SecurityConfig {
                                 .disable()) // Desactiva CSRF (común en APIs REST stateless)
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                .requestMatchers("/auth/**").permitAll() // Permite públicamente login y register
-                                .requestMatchers("/admin/**").hasAuthority("ADMIN") // Solo ADMIN puede acceder a /admin/**
-                                .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
+                                        .requestMatchers("/auth/**").permitAll() // Permite públicamente login y register
+                                        .requestMatchers("/admin/user/*").hasAnyAuthority("ADMIN", "ALMACENERO") // Permite ADMIN y ALMACENERO obtener usuario por id
+                                        .requestMatchers("/admin/**").hasAuthority("ADMIN") // Solo ADMIN puede acceder al resto de /admin/**
+                                        .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
                 )
                 .sessionManagement(sessionManager->
                         sessionManager

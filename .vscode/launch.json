@@ -70,6 +70,17 @@
             "mainClass": "com.alocode.material_service.MaterialServiceApplication",
             "projectName": "material-service",
             "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=65274 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=material-service"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-AlmacenServiceApplication<almacen-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.alocode.almacen_service.AlmacenServiceApplication",
+            "projectName": "almacen-service",
+            "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
