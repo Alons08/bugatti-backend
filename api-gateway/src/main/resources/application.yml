@@ -12,10 +12,6 @@ spring:
           uri: lb://usuario-service
           predicates:
             - Path=/auth/**, /admin/**, /usuarios/**
-        - id: habitacion-service
-          uri: lb://habitacion-service
-          predicates:
-            - Path=/rooms/**, /room-types/**, /rates/**
         - id: material-service
           uri: lb://material-service
           predicates:

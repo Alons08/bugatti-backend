@@ -72,8 +72,8 @@ public class AuthFilter implements WebFilter {
 	}
 
 	private boolean isAdminPath(String path) {
-		// Proteger todos los endpoints de habitacion-service
-		return path.startsWith("/rooms") || path.startsWith("/room-types") || path.startsWith("/rates");
+		// Aquí protegemos las rutas que considere, pero de momento solo las de usuario son exclusivas
+		return false;
 	}
 
 	private SecretKey getSigningKey() {
