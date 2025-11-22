@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/almacen-material")
+@RequestMapping("/almacen-material")
 @RequiredArgsConstructor
 public class AlmacenMaterialController {
     private final AlmacenMaterialService almacenMaterialService;

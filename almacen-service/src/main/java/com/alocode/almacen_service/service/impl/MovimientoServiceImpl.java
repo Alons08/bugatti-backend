@@ -27,7 +27,7 @@ public class MovimientoServiceImpl implements MovimientoService {
             .idAlmacen(request.getIdAlmacen())
             .idUsuario(request.getIdUsuario())
             .tipoMovimiento(TipoMovimiento.valueOf(request.getTipoMovimiento()))
-            .fechaHora(request.getFechaHora())
+            .fechaHora(java.time.LocalDateTime.now())
             .descripcion(request.getDescripcion())
             .referencia(request.getReferencia())
             .build();

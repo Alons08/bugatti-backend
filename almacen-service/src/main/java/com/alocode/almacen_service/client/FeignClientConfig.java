@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @Configuration
 public class FeignClientConfig {
 
-
     @Bean
     public RequestInterceptor requestInterceptor() {
         return template -> {

@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/almacenes")
+@RequestMapping("/almacenes")
 @RequiredArgsConstructor
 public class AlmacenController {
     private final AlmacenService almacenService;
 
     @PostMapping
     public ResponseEntity<AlmacenResponse> create(@RequestBody AlmacenRequest request) {
-        System.out.println("[AlmacenController] POST /api/almacenes ejecutado. Request: " + request);
+        System.out.println("[AlmacenController] POST /almacenes ejecutado. Request: " + request);
         return ResponseEntity.ok(almacenService.createAlmacen(request));
     }
 

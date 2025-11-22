@@ -23,7 +23,7 @@ spring:
         - id: almacen-service
           uri: lb://almacen-service
           predicates:
-            - Path=/api/almacenes/**, /api/almacen-material/**, /api/movimientos/**
+            - Path=/almacenes/**, /almacen-material/**, /movimientos/**
 
 # Configuración de Eureka
 eureka:
