@@ -61,6 +61,7 @@ public class AlmacenServiceImpl implements AlmacenService {
     public AlmacenResponse updateAlmacen(Integer id, AlmacenRequest request) {
         return almacenRepository.findById(id)
                 .map(almacen -> {
+                    almacen.setIdUsuario(request.getIdUsuario());
                     almacen.setCodigoAlmacen(request.getCodigoAlmacen());
                     almacen.setNombre(request.getNombre());
                     almacen.setDireccion(request.getDireccion());
