@@ -2,17 +2,28 @@ package com.alocode.almacen_service.service.impl;
 
 import com.alocode.almacen_service.dto.request.AlmacenRequest;
 import com.alocode.almacen_service.dto.response.AlmacenResponse;
+import com.alocode.almacen_service.dto.response.EstadisticasResponse;
+import com.alocode.almacen_service.dto.response.MovimientoRecienteResponse;
 import com.alocode.almacen_service.entity.Almacen;
+import com.alocode.almacen_service.entity.Movimiento;
+import com.alocode.almacen_service.entity.MovimientoDetalle;
 import com.alocode.almacen_service.repository.AlmacenRepository;
+import com.alocode.almacen_service.repository.AlmacenMaterialRepository;
+import com.alocode.almacen_service.repository.MovimientoRepository;
+import com.alocode.almacen_service.repository.MovimientoDetalleRepository;
 import com.alocode.almacen_service.service.AlmacenService;
 import com.alocode.almacen_service.client.UsuarioFeignClient;
+import com.alocode.almacen_service.client.MaterialFeignClient;
 import com.alocode.almacen_service.client.dto.UsuarioClientResponse;
+import com.alocode.almacen_service.client.dto.MaterialClientResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,7 +31,11 @@ import java.util.stream.Collectors;
 public class AlmacenServiceImpl implements AlmacenService {
     private static final Logger log = LoggerFactory.getLogger(AlmacenServiceImpl.class);
     private final AlmacenRepository almacenRepository;
+    private final AlmacenMaterialRepository almacenMaterialRepository;
+    private final MovimientoRepository movimientoRepository;
+    private final MovimientoDetalleRepository movimientoDetalleRepository;
     private final UsuarioFeignClient usuarioFeignClient;
+    private final MaterialFeignClient materialFeignClient;
 
     @Override
     public AlmacenResponse createAlmacen(AlmacenRequest request) {
@@ -79,6 +94,66 @@ public class AlmacenServiceImpl implements AlmacenService {
     @Override
     public void deleteAlmacen(Integer id) {
         almacenRepository.deleteById(id);
+    }
+
+    @Override
+    public EstadisticasResponse getEstadisticas() {
+        Integer stockTotal = almacenMaterialRepository.getTotalStock();
+        Integer materialesAgotados = almacenMaterialRepository.getMaterialesAgotados();
+        Integer movimientosHoy = movimientoRepository.getMovimientosDelDia(LocalDate.now());
+        
+        return EstadisticasResponse.builder()
+            .stockTotal(stockTotal != null ? stockTotal : 0)
+            .materialesAgotados(materialesAgotados != null ? materialesAgotados : 0)
+            .movimientosHoy(movimientosHoy != null ? movimientosHoy : 0)
+            .build();
+    }
+
+    @Override
+    public List<MovimientoRecienteResponse> getMovimientosRecientes(Integer limite) {
+        List<Movimiento> movimientos = movimientoRepository.findMovimientosRecientes();
+        
+        // Limitar resultados si se especifica
+        if (limite != null && limite > 0) {
+            movimientos = movimientos.stream().limit(limite).collect(Collectors.toList());
+        }
+        
+        List<MovimientoRecienteResponse> result = new ArrayList<>();
+        
+        for (Movimiento movimiento : movimientos) {
+            // Obtener detalles del movimiento
+            List<MovimientoDetalle> detalles = movimientoDetalleRepository.findByIdMovimiento(movimiento.getIdMovimiento());
+            
+            for (MovimientoDetalle detalle : detalles) {
+                try {
+                    // Obtener información del material
+                    MaterialClientResponse material = materialFeignClient.getMaterialById(detalle.getIdMaterial());
+                    
+                    MovimientoRecienteResponse item = MovimientoRecienteResponse.builder()
+                        .nombreMaterial(material != null ? material.getNombre() : "Material desconocido")
+                        .tipoMovimiento(movimiento.getTipoMovimiento().name())
+                        .cantidad(detalle.getCantidad())
+                        .hora(movimiento.getFechaHora())
+                        .build();
+                    
+                    result.add(item);
+                } catch (Exception e) {
+                    log.warn("[AlmacenService] Error obteniendo material {}: {}", detalle.getIdMaterial(), e.getMessage());
+                    
+                    // Agregar con información limitada si falla el servicio
+                    MovimientoRecienteResponse item = MovimientoRecienteResponse.builder()
+                        .nombreMaterial("Material ID: " + detalle.getIdMaterial())
+                        .tipoMovimiento(movimiento.getTipoMovimiento().name())
+                        .cantidad(detalle.getCantidad())
+                        .hora(movimiento.getFechaHora())
+                        .build();
+                    
+                    result.add(item);
+                }
+            }
+        }
+        
+        return result;
     }
 
     private AlmacenResponse toResponse(Almacen almacen) {

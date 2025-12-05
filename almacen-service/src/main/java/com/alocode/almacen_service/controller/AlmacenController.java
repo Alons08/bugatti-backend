@@ -2,6 +2,8 @@ package com.alocode.almacen_service.controller;
 
 import com.alocode.almacen_service.dto.request.AlmacenRequest;
 import com.alocode.almacen_service.dto.response.AlmacenResponse;
+import com.alocode.almacen_service.dto.response.EstadisticasResponse;
+import com.alocode.almacen_service.dto.response.MovimientoRecienteResponse;
 import com.alocode.almacen_service.service.AlmacenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,5 +41,16 @@ public class AlmacenController {
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         almacenService.deleteAlmacen(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/estadisticas")
+    public ResponseEntity<EstadisticasResponse> getEstadisticas() {
+        return ResponseEntity.ok(almacenService.getEstadisticas());
+    }
+
+    @GetMapping("/movimientos-recientes")
+    public ResponseEntity<List<MovimientoRecienteResponse>> getMovimientosRecientes(
+            @RequestParam(defaultValue = "5") Integer limite) {
+        return ResponseEntity.ok(almacenService.getMovimientosRecientes(limite));
     }
 }
