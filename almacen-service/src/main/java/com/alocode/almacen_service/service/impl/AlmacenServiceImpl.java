@@ -16,6 +16,7 @@ import com.alocode.almacen_service.client.UsuarioFeignClient;
 import com.alocode.almacen_service.client.MaterialFeignClient;
 import com.alocode.almacen_service.client.dto.UsuarioClientResponse;
 import com.alocode.almacen_service.client.dto.MaterialClientResponse;
+import com.alocode.almacen_service.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public class AlmacenServiceImpl implements AlmacenService {
     private final MovimientoDetalleRepository movimientoDetalleRepository;
     private final UsuarioFeignClient usuarioFeignClient;
     private final MaterialFeignClient materialFeignClient;
+    private final JwtUtil jwtUtil;
 
     @Override
     public AlmacenResponse createAlmacen(AlmacenRequest request) {
@@ -175,5 +177,17 @@ public class AlmacenServiceImpl implements AlmacenService {
         log.info("[AlmacenService] Respuesta Feign usuario: {}", usuario);
         response.setNombreUsuario(usuario != null ? usuario.getNombre() : null);
         return response;
+    }
+
+    @Override
+    public List<AlmacenResponse> getAlmacenesByUsuario(String email) {
+        log.info("[AlmacenService] Obteniendo almacenes para usuario con email: {}", email);
+        UsuarioClientResponse usuario = usuarioFeignClient.getUsuarioByEmail(email);
+        if (usuario == null) {
+            log.warn("[AlmacenService] Usuario no encontrado para email: {}", email);
+            return List.of();
+        }
+        List<Almacen> almacenes = almacenRepository.findByIdUsuario(usuario.getId());
+        return almacenes.stream().map(this::toResponse).collect(Collectors.toList());
     }
 }

@@ -31,6 +31,7 @@ public class SecurityConfig {
                         authRequest
                             .requestMatchers("/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password").permitAll() // públicas
                             .requestMatchers("/auth/me").authenticated() // privada
+                            .requestMatchers("/admin/user/email/*").authenticated() // privada, pero permite cualquier usuario autenticado para llamadas internas
                             .requestMatchers("/admin/user/*").hasAnyAuthority("ADMIN", "ALMACENERO") // privada
                             .requestMatchers("/admin/**").hasAuthority("ADMIN") // privada 
                             .anyRequest().authenticated()

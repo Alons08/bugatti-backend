@@ -9,4 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UsuarioFeignClient {
     @GetMapping("/admin/user/{id}")
     UsuarioClientResponse getUsuarioById(@PathVariable("id") Integer id);
+
+    @GetMapping("/admin/user/email/{email}")
+    UsuarioClientResponse getUsuarioByEmail(@PathVariable("email") String email);
 }

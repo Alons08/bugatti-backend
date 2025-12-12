@@ -14,4 +14,5 @@ public interface AlmacenService {
     void deleteAlmacen(Integer id);
     EstadisticasResponse getEstadisticas();
     List<MovimientoRecienteResponse> getMovimientosRecientes(Integer limite);
+    List<AlmacenResponse> getAlmacenesByUsuario(String email);
 }

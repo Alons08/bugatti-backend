@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class UsuarioClientResponse {
-    private Integer idUsuario;
+    private Integer id;
     private String nombre;
     private String correo;
     private String imagenUrl;

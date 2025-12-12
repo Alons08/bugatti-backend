@@ -5,6 +5,7 @@ import com.alocode.almacen_service.dto.response.AlmacenResponse;
 import com.alocode.almacen_service.dto.response.EstadisticasResponse;
 import com.alocode.almacen_service.dto.response.MovimientoRecienteResponse;
 import com.alocode.almacen_service.service.AlmacenService;
+import com.alocode.almacen_service.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AlmacenController {
     private final AlmacenService almacenService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping
     public ResponseEntity<AlmacenResponse> create(@RequestBody AlmacenRequest request) {
@@ -46,6 +48,17 @@ public class AlmacenController {
     @GetMapping("/estadisticas")
     public ResponseEntity<EstadisticasResponse> getEstadisticas() {
         return ResponseEntity.ok(almacenService.getEstadisticas());
+    }
+
+    @GetMapping("/usuario")
+    public ResponseEntity<List<AlmacenResponse>> getAlmacenesByUsuario(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", "");
+        java.util.List<String> roles = jwtUtil.getRolesFromToken(jwtToken);
+        if (roles == null || !roles.contains("ALMACENERO")) {
+            return ResponseEntity.status(403).build(); // Forbidden
+        }
+        String email = jwtUtil.getUsernameFromToken(jwtToken);
+        return ResponseEntity.ok(almacenService.getAlmacenesByUsuario(email));
     }
 
     @GetMapping("/movimientos-recientes")
